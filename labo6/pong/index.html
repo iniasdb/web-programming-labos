@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong</title>
+    <script src="./ball.js"></script>
+    <script src="./paddle.js"></script>
+    <script>        
+        document.addEventListener("DOMContentLoaded",(event)=>{
+            let canvasWidth = 700;
+            let canvasHeight = 700;
+            let canvas = document.querySelector("canvas");
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            let context = canvas.getContext("2d");
+
+            let ball = new Ball(canvas, 6, 15);
+            let paddle1 = new Paddle(canvas, 10, 300, 6);
+            let paddle2 = new Paddle(canvas, 680, 300, 6);
+
+            function Animate(){
+                context.clearRect(0,0,canvasWidth,canvasHeight);
+                context.fillStyle="black";
+                context.fillRect(0,0,canvasWidth,canvasHeight);
+                
+                ball.Move();
+                ball.CheckBoundaries();
+                
+                ball.Draw();
+                paddle1.Draw();
+                paddle2.Draw();
+
+                if (CollideR(ball, paddle1)) {
+                    ball.changeDirection();
+                } 
+
+                if (CollideL(ball, paddle2)) {
+                    ball.changeDirection();
+                }               
+
+                if (ball.isGameActive()) {
+                    setTimeout(Animate,33);
+                }
+            }
+
+            function CollideL(ball, paddle){
+                if (ball.getXPos() > (paddle.getXPos() - paddle.getWidth()) && (paddle.getYPos() < ball.getYPos() && ball.getYPos() < (paddle.getYPos()+paddle.getHeight()))) {
+                    return true;
+                }
+                return false;
+            }
+
+            function CollideR(ball, paddle){
+                if (ball.getXPos() < (paddle.getXPos() + paddle.getWidth()) && (paddle.getYPos() < ball.getYPos() && ball.getYPos() < (paddle.getYPos()+paddle.getHeight()))) {
+                    return true;
+                }
+                return false;
+            }
+
+            document.addEventListener("mousemove",(mouseEvent)=>{
+                paddle1.Move(mouseEvent.pageY);
+            });
+
+            document.addEventListener("keydown", (KeyboardEvent)=>{
+                let yPos = paddle2.getYPos();
+                switch (KeyboardEvent.key) {
+                    case "ArrowUp":
+                        if (!isOutOfBoundsTop(yPos)) {
+                            yPos -= 10;
+                        }
+                        break;
+                    case "ArrowDown":
+                        if (!isOutOfBoundsBottom(yPos)) {
+                            yPos += 10;
+                        }
+                    default:
+                }
+
+                paddle2.setYPos(yPos);
+            })
+
+            function isOutOfBoundsTop(yPos) {
+
+                if (yPos-15 < 0) {
+                    return true;
+                }
+                console.log(yPos);
+
+                return false;
+            }
+
+            function isOutOfBoundsBottom(yPos) {
+
+                if (yPos+100 > canvasHeight) {
+                    return true;
+                }
+                console.log(yPos);
+
+                return false;
+            }
+
+            Animate();
+
+        });
+
+    </script>
+</head>
+<body>
+
+    <canvas></canvas>
+    
+</body>
+</html>
